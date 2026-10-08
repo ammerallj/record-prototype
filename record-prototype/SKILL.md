@@ -113,12 +113,12 @@ that lands on the end state. When the user says something is "missing", add the 
 Echo the shot list back as a short numbered list (one line per beat, camera noted) and record
 straight away unless something is ambiguous.
 
-**Cuts from one prototype.** A short cut of a longer flow ("from the open orb: type, dim the threads")
+**Cuts from one prototype.** A short cut of a longer flow ("from the open detail view: type in the search box, watch the list dim")
 is the same shot list with `setup` carrying the app to the starting state off camera, then only the
 beats wanted in `sequence`. Make `setup` use the real controls a person would: find the control in
 the page (`read_page`, its `aria-label`), hover first when it only appears on hover, and end with a
 `waitFor` plus a `wait` so the state has settled before the film starts. Clicking a label that is not
-the control (an orb's name instead of its "Open" button) silently does nothing and fails later.
+the control (a card's title instead of its "Open" button) silently does nothing and fails later.
 
 **Never overwrite a take the user keeps.** Recordings are written under the shot list's `name`, so a
 new take of the same name replaces the old one. When the user says to keep a take, or asks for a
