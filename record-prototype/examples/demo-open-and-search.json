@@ -1,0 +1,91 @@
+{
+  "name": "demo-open-and-search",
+  "url": "http://localhost:5173/",
+  "settle": 3000,
+  "hide": [
+    ".debug-bar"
+  ],
+  "frame": {
+    "background": "#ffffff",
+    "shadow": "soft",
+    "radius": 12,
+    "browser": "none"
+  },
+  "output": {
+    "formats": [
+      "mp4"
+    ],
+    "poster": true
+  },
+  "setup": [
+    {
+      "note": "open the Pricing card and let it settle, off camera"
+    },
+    {
+      "click": {
+        "selector": ".card",
+        "text": "Pricing"
+      },
+      "ms": 200
+    },
+    {
+      "waitFor": ".page-back",
+      "timeout": 2000
+    },
+    {
+      "wait": 2000
+    },
+    {
+      "jump": {
+        "x": 0.7,
+        "y": 0.62
+      }
+    },
+    {
+      "wait": 600
+    }
+  ],
+  "sequence": [
+    {
+      "note": "1. Pricing open",
+      "wait": 2000
+    },
+    {
+      "note": "2. back to the list",
+      "click": ".page-back",
+      "ms": 1200
+    },
+    {
+      "note": "3. the list settles",
+      "move": {
+        "x": 0.66,
+        "y": 0.78
+      },
+      "ms": 1000
+    },
+    {
+      "wait": 2000
+    },
+    {
+      "note": "4. into the search box",
+      "click": {
+        "selector": ".search input",
+        "offset": [
+          -80,
+          2
+        ]
+      },
+      "ms": 1000
+    },
+    {
+      "wait": 500
+    },
+    {
+      "type": "summer sale"
+    },
+    {
+      "note": "5. matching cards rise",
+      "wait": 3000
+    }
+  ]
+}
