@@ -1,0 +1,101 @@
+{
+  "name": "threadscape-exit-and-match",
+  "url": "http://localhost:5173/",
+  "settle": 4500,
+  "hide": [
+    ".lab"
+  ],
+  "frame": {
+    "background": "#ffffff",
+    "shadow": "soft",
+    "radius": 12,
+    "browser": "none"
+  },
+  "output": {
+    "formats": [
+      "mp4"
+    ],
+    "poster": true
+  },
+  "setup": [
+    {
+      "note": "open Travel from its chevron and let its cards settle, off camera"
+    },
+    {
+      "jump": {
+        "selector": ".orb",
+        "text": "Travel"
+      }
+    },
+    {
+      "wait": 900
+    },
+    {
+      "click": {
+        "selector": ".orb",
+        "text": "Travel",
+        "inner": ".orb__open"
+      },
+      "ms": 200
+    },
+    {
+      "waitFor": ".hdr__back",
+      "timeout": 2000
+    },
+    {
+      "wait": 3500
+    },
+    {
+      "jump": {
+        "x": 0.7,
+        "y": 0.62
+      }
+    },
+    {
+      "wait": 600
+    }
+  ],
+  "sequence": [
+    {
+      "note": "1. Travel open",
+      "wait": 2200
+    },
+    {
+      "note": "2. exit from the chevron",
+      "click": ".hdr__back",
+      "ms": 1300
+    },
+    {
+      "note": "3. home: the orbs settle back",
+      "move": {
+        "x": 0.66,
+        "y": 0.78
+      },
+      "ms": 1000
+    },
+    {
+      "wait": 3200
+    },
+    {
+      "note": "4. into the input",
+      "click": {
+        "selector": ".input input",
+        "offset": [
+          -120,
+          2
+        ]
+      },
+      "ms": 1100
+    },
+    {
+      "wait": 600
+    },
+    {
+      "type": "I want to plan a trip to Japan"
+    },
+    {
+      "note": "5. the match: Travel forward, Continue in Travel offered",
+      "wait": 3500
+    }
+  ]
+}

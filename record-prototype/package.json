@@ -1,0 +1,10 @@
+{
+  "name": "record-prototype",
+  "private": true,
+  "type": "module",
+  "description": "Frame-stepped recorder for prototype demo videos",
+  "dependencies": {
+    "ffmpeg-static": "^5.2.0",
+    "puppeteer-core": "^24.0.0"
+  }
+}
