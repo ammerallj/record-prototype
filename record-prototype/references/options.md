@@ -93,7 +93,9 @@ fully sharp at the default output scale.
 | `viewport` | `{ width, height }` of the app window in CSS px — 1440×900 laptop · 1280×800 · 1920×1080 · 390×844 phone | 1440×900 |
 | `colorScheme` | `light` · `dark` | `light` |
 | `settle` | ms the page runs before anything happens (cover any loading screen) | 1500 |
-| `hide` | selectors hidden for the film, e.g. a debug or lab bar | `[]` |
+| `hide` | selectors hidden for the film, e.g. a debug or lab bar. Keep it narrow: the recorder warns when a selector removes controls or text | `[]` |
+| `nativeCaret` | `true` keeps Chrome's own caret blink (which flickers on film); default replaces it with a film-clock blink | `false` |
+| `stepTimeout` | real-time ms before a step is declared stuck and the run stops, naming the step | `90000` |
 | `css` | extra CSS injected for the film | `""` |
 | `intercept` | `[{ "match": "/src/data/mock.ts", "find": "regex", "replace": "text" }]` — rewrite a source file as it loads, for film-only tweaks | `[]` |
 

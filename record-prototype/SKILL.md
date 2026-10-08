@@ -104,8 +104,25 @@ Translate the request into a JSON shot list (format below). Find targets by read
 page (the built-in browser's `read_page`, or the source) — prefer a stable selector plus
 visible text, e.g. `{ "selector": ".card", "text": "Pricing" }`, over coordinates.
 
+**Cover the whole loop, and film the transitions.** A flow is the states *and* what happens between
+them. Read the docs/interaction checklist for every state the flow passes through (including the
+return trip: leaving a view and landing back, a second pass that builds on the first), and give each
+state change a `wait`/`hold` long enough to see it finish (enter, exit, landing: 1.5-4s), never a cut
+that lands on the end state. When the user says something is "missing", add the beat, don't explain it.
+
 Echo the shot list back as a short numbered list (one line per beat, camera noted) and record
 straight away unless something is ambiguous.
+
+**Cuts from one prototype.** A short cut of a longer flow ("from the open orb: type, dim the threads")
+is the same shot list with `setup` carrying the app to the starting state off camera, then only the
+beats wanted in `sequence`. Make `setup` use the real controls a person would: find the control in
+the page (`read_page`, its `aria-label`), hover first when it only appears on hover, and end with a
+`waitFor` plus a `wait` so the state has settled before the film starts. Clicking a label that is not
+the control (an orb's name instead of its "Open" button) silently does nothing and fails later.
+
+**Never overwrite a take the user keeps.** Recordings are written under the shot list's `name`, so a
+new take of the same name replaces the old one. When the user says to keep a take, or asks for a
+cut or variant, copy the files aside (or give the new shot list its own `name`) before rendering.
 
 **Rehearse first.** Before every render, run the shot list with `--rehearse`: it plays the
 whole sequence on the film clock without filming or encoding (about real time, against ~8–10×
@@ -139,7 +156,14 @@ FF=$(node -e "import('ffmpeg-static').then(m=>console.log(m.default))")
 $FF -y -loglevel error -i OUT.mp4 -vf "fps=1.5,scale=560:-1,tile=4x4" -frames:v 1 sheet.jpg
 ```
 
-Check: the opening frame is clean (no loader mid-fade unless wanted — raise `settle`), hovers
+First confirm the render is new: the video's mtime is after you started (`ls -lT`), and read the
+recorder's *full* output, never `| tail` alone (a failed render prints its error before the end and
+leaves the previous take on disk, which then gets reviewed as if it were new). Run long renders with
+`run_in_background` and wait for the notification; do not `sleep`-poll.
+
+Check: every state in the shot list appears in the sheet; every control the product shows is on
+screen (the recorder warns when a `hide` selector removes controls or text: read that warning);
+the opening frame is clean (no loader mid-fade unless wanted — raise `settle`), hovers
 have settled before the cut, nothing important leaves the frame during a zoom, typing finishes,
 the ending holds long enough. Fix the shot list and re-run rather than explaining defects away.
 
@@ -181,6 +205,19 @@ Targets are re-aimed every frame, so the cursor lands on things that drift.
 
 ## Rules
 
+- **Sending a message:** if `Enter` stalls inside a view, click the visible Send button (see the
+  stuck-step rule). Typing, selecting and clicking are reliable; submitting by key is the one known
+  exception.
+- **Hide the narrowest selector.** `hide` is for debug UI (a lab bar). A container often holds real
+  product UI too (a count, a filter control); the recorder prints what each `hide` removes, so read it.
+- **Caret blink is handled.** Frames run ~10x faster than real time, which made Chrome's native caret
+  flicker; the recorder replaces it with a film-clock CSS blink on every input (opt out with
+  `"nativeCaret": true`). Any other real-time-only effect (native video, CSS driven by wall clock)
+  has the same problem: look at it in the contact sheet, then drive it with `css` or `js`.
+- **A step that hangs is reported, not endless.** Each step has a real-time limit (`stepTimeout`, 90000
+  ms); a stuck step prints its number and exits. Known case: pressing `Enter` to send inside an open
+  thread hung the recorder while the app was fine; click the Send button instead
+  (`{ "click": "button[aria-label='Send']" }`). Use that workaround whenever Enter stalls.
 - **Recording stays out of the app.** Never add recording switches, query params or demo-only
   code to the prototype. Film-only changes go through `hide`, `css`, `intercept` (rewrite a
   source file as it loads) or `setup` steps — and if a change might be wanted in the prototype

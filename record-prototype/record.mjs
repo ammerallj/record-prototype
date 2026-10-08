@@ -308,8 +308,18 @@ try {
   const cdp = await page.createCDPSession()
   await page.goto(o.url, { waitUntil: 'domcontentloaded' })
   await page.evaluate(() => document.fonts.ready)
-  const hideCss = (o.hide.length ? `${o.hide.join(', ')} { display: none !important; }\n` : '') + o.css
+  // Chrome's native caret blinks on real time, but frames are stepped ~10x faster than real time,
+  // so it flickers on film. Take it over with a CSS animation, which runs on the film clock.
+  const caretCss = o.nativeCaret ? '' : `@keyframes __film-caret{0%,49%{caret-color:currentColor}50%,100%{caret-color:transparent}}
+input,textarea,[contenteditable]{caret-animation:manual !important;animation:__film-caret 1.06s step-end infinite !important}\n`
+  const hideCss = caretCss + (o.hide.length ? `${o.hide.join(', ')} { display: none !important; }\n` : '') + o.css
   if (hideCss) await page.addStyleTag({ content: hideCss })
+  for (const sel of o.hide) {
+    // hidden elements are still in the DOM: list what the selector takes off screen
+    const hidden = await page.evaluate((q) => [...document.querySelectorAll(q)].flatMap((e) => [...e.querySelectorAll('button,a,input,[role=button]')].map((c) => (c.getAttribute('aria-label') || c.textContent || c.tagName).trim().slice(0, 40))).filter(Boolean).slice(0, 8), sel)
+    const text = await page.evaluate((q) => [...document.querySelectorAll(q)].map((e) => (e.textContent || '').trim()).join(' ').slice(0, 80), sel)
+    if (hidden.length || text) console.warn(`hide "${sel}" removes ${hidden.length ? `controls [${hidden.join(' | ')}]` : ''}${text ? ` text "${text}"` : ''} from the film. Fine for a debug bar; if it is product UI, hide a narrower selector (the debug bar, not its container).`)
+  }
   await page.evaluate(CURSOR(o.cursor.size, TOUCH))
 
   // ---- state ----
@@ -466,8 +476,13 @@ try {
 
   const run = async (steps) => {
     for (const [i, s] of steps.entries()) {
-      try { await step(s) } catch (e) {
+      let timer
+      const stuck = new Promise((_, rej) => { timer = setTimeout(() => rej(new Error(`stuck for ${(o.stepTimeout ?? 90000) / 1000}s of real time (the page or the input is not responding to this step; try the equivalent click, e.g. the Send button instead of Enter)`)), o.stepTimeout ?? 90000) })
+      try { await Promise.race([step(s), stuck]); clearTimeout(timer) } catch (e) {
+        clearTimeout(timer)
         e.message = `step ${i + 1}${s.note ? ` ("${s.note}")` : ''} ${JSON.stringify(s)}: ${e.message}`
+        // a wedged page can also block browser.close(), so a stuck step ends the process outright
+        if (/^stuck/.test(e.message.split(': ').pop())) { console.error(e.message); process.exit(3) }
         throw e
       }
     }
