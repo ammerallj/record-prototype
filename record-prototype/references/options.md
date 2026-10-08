@@ -79,13 +79,16 @@ fully sharp at the default output scale.
 | `shadow` | `none` · `hairline` · `soft` (layered, the Meta-video look) · `medium` · `strong` · `float` (lifted, offset downward) · any CSS `box-shadow` | `soft` |
 | `radius` | window corner radius, px | 12 |
 | `padding` | stage margin around the window, px (raise for `strong` / `float`) | 120 |
+| `device` | `iphone`: draws an iPhone body around the screen (rounded bezel, side buttons, Dynamic Island over the page). Use with a phone `viewport` | none |
+| `color` | with `device: "iphone"`: `black` · `gray` (dark grey) · `white` | `black` |
+| `island` | with `device: "iphone"`: `false` hides the Dynamic Island | `true` |
 
 ## Page
 
 | Setting | Meaning | Default |
 |---|---|---|
 | `url` | the running prototype | `http://localhost:5173/` |
-| `device` | `mobile` (390×844, touch, radius 44) · `tablet` (820×1180, touch) — shorthand; anything set alongside wins | none |
+| `device` | `iphone` (390×844, touch, iPhone body, radius 47) · `mobile` (390×844, touch, radius 44) · `tablet` (820×1180, touch) — shorthand; anything set alongside wins | none |
 | `touch` | `true`: iPhone user agent, touch events instead of a mouse, a finger dot instead of an arrow. Desktop steps map over: click→tap, drag→finger drag, scroll→finger swipe (opposite direction), hover→wait. `userAgent` overrides the UA | `false` |
 | `viewport` | `{ width, height }` of the app window in CSS px — 1440×900 laptop · 1280×800 · 1920×1080 · 390×844 phone | 1440×900 |
 | `colorScheme` | `light` · `dark` | `light` |

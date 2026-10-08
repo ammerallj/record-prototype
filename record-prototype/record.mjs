@@ -27,7 +27,7 @@ const DEFAULTS = {
   hide: [],
   css: '',
   intercept: [],
-  frame: { background: '#ffffff', shadow: 'soft', radius: 12, padding: 120, browser: 'none', address: '' },
+  frame: { background: '#ffffff', shadow: 'soft', radius: 12, padding: 120, browser: 'none', address: '', device: null, color: 'black', island: true },
   touch: false,
   userAgent: null,
   cursor: { show: true, start: { x: 0.78, y: 0.82 }, size: 1, click: 'press' },
@@ -48,6 +48,7 @@ const SHADOWS = {
 // "device" shorthand: a viewport, touch input (finger dot instead of an arrow), a phone-shaped window
 const DEVICES = {
   mobile: { viewport: { width: 390, height: 844 }, touch: true, frame: { radius: 44 } },
+  iphone: { viewport: { width: 390, height: 844 }, touch: true, frame: { device: 'iphone', radius: 47 } },
   tablet: { viewport: { width: 820, height: 1180 }, touch: true, frame: { radius: 28 } },
 }
 const MOBILE_UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'
@@ -190,6 +191,16 @@ const EASES = {
 }
 const isAlphaBg = (bg) => bg === 'transparent'
 
+// iPhone bodies: the coloured band, its gradient and edge highlight (the screen's black bezel is the same on all)
+const PHONES = {
+  black: { band: 'linear-gradient(145deg,#2a2a2d 0%,#111113 45%,#0a0a0b 100%)', ring: 'rgba(255,255,255,.16)', key: '#1c1c1e' },
+  gray: { band: 'linear-gradient(145deg,#5a5a5e 0%,#3b3b3e 45%,#2c2c2f 100%)', ring: 'rgba(255,255,255,.22)', key: '#3d3d40' },
+  white: { band: 'linear-gradient(145deg,#fbfbf9 0%,#e6e6e2 45%,#d3d3cf 100%)', ring: 'rgba(0,0,0,.14)', key: '#dcdcd8' },
+}
+PHONES.grey = PHONES.darkgray = PHONES.gray
+PHONES.silver = PHONES.white
+const phoneEdge = (W) => Math.round(14 * Math.max(0.8, W / 390)) // band + bezel around the screen
+
 function stageHtml(o, W, H, mode) {
   const f = o.frame, B = BAR[f.browser] ?? 0, P = f.padding, R = f.radius
   const dark = o.colorScheme === 'dark'
@@ -198,12 +209,28 @@ function stageHtml(o, W, H, mode) {
   const shadow = SHADOWS[f.shadow] ?? f.shadow
   const barBg = dark ? '#2b2b2d' : '#f2f2f2', barLine = dark ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.08)'
   const addrBg = dark ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.05)', addrInk = dark ? '#aaa' : '#666'
+  const dev = f.device === 'iphone'
+  const ph = dev ? PHONES[f.color] : null
+  if (dev && !ph) throw new Error(`unknown frame.color: ${f.color} (black, white, gray)`)
+  const T = dev ? phoneEdge(W) : 0, k = W / 390
+  const phoneCss = !dev ? '' : `
+    .phone { position: absolute; left: ${P - T}px; top: ${P - T}px; width: ${W + 2 * T}px; height: ${H + 2 * T}px; border-radius: ${R + T}px;
+      background: ${ph.band}; box-shadow: ${shadow}, inset 0 0 0 1.5px ${ph.ring}; display: ${mode === 'stage' ? 'block' : 'none'}; }
+    .phone::after { content: ''; position: absolute; inset: ${Math.round(T * 0.64)}px; border-radius: ${R + Math.round(T * 0.36)}px; background: #000;
+      box-shadow: 0 0 0 1px rgba(0,0,0,.35); }
+    .phone b { position: absolute; background: ${ph.key}; box-shadow: inset 0 0 0 1px ${ph.ring}; }
+    .island { position: absolute; z-index: 5; left: 50%; top: ${Math.round(11 * k)}px; width: ${Math.round(126 * k)}px; height: ${Math.round(37 * k)}px;
+      transform: translateX(-50%); border-radius: 999px; background: #000; }`
+  const phone = !dev ? '' : `<div class="phone">${[ // [side, top, height] in screen points: action, volume up, volume down, power
+    ['l', 118, 32], ['l', 172, 62], ['l', 244, 62], ['r', 196, 100],
+  ].map(([sd, y, h]) => `<b style="${sd === 'l' ? 'left' : 'right'}:-3px;top:${T + Math.round(y * k)}px;width:4px;height:${Math.round(h * k)}px;border-radius:2px"></b>`).join('')}</div>`
+  const island = dev && f.island ? '<div class="island"></div>' : ''
   const css = `
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: ${W + 2 * P}px; height: ${H + B + 2 * P}px; overflow: hidden; }
     body { background: ${mode === 'mask' ? '#000' : bg}; }
     .window { position: absolute; left: ${P}px; top: ${P}px; width: ${W}px; height: ${H + B}px; border-radius: ${R}px; overflow: hidden;
-      background: ${mode === 'mask' ? '#000' : '#fff'}; box-shadow: ${mode === 'stage' ? shadow : 'none'}; }
+      background: ${mode === 'mask' || dev ? '#000' : '#fff'}; box-shadow: ${mode === 'stage' && !dev ? shadow : 'none'}; }
     .window.gone { visibility: hidden; }
     .bar { height: ${B}px; background: ${barBg}; border-bottom: 0.5px solid ${barLine}; display: flex; align-items: center; padding: 0 16px; gap: 8px; position: relative;
       visibility: ${mode === 'mask' ? 'hidden' : 'visible'}; }
@@ -211,10 +238,10 @@ function stageHtml(o, W, H, mode) {
     .bar i:nth-child(1) { background: #ff5f57; } .bar i:nth-child(2) { background: #febc2e; } .bar i:nth-child(3) { background: #28c840; }
     .addr { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 38%; height: 28px; border-radius: 8px; background: ${addrBg};
       color: ${addrInk}; font: 13px -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif; display: flex; align-items: center; justify-content: center; }
-    .content { height: ${H}px; background: ${mode === 'mask' ? '#fff' : dark ? '#000' : '#fff'}; }`
+    .content { height: ${H}px; background: ${mode === 'mask' ? '#fff' : dark || dev ? '#000' : '#fff'}; }${phoneCss}`
   const bar = B ? `<div class="bar"><i></i><i></i><i></i>${f.browser === 'browser' ? `<div class="addr">${f.address || ''}</div>` : ''}</div>` : ''
   return `<!doctype html><html><head><meta charset="utf-8"><style>${css}</style></head>
-    <body><div class="window${mode === 'bg' ? ' gone' : ''}">${bar}<div class="content"></div></div></body></html>`
+    <body>${phone}<div class="window${mode === 'bg' ? ' gone' : ''}">${bar}<div class="content"></div>${island}</div></body></html>`
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -234,6 +261,7 @@ const W = o.viewport.width, H = o.viewport.height, FPS = o.fps, DT = 1000 / FPS
 const OS = o.output.scale
 const B = BAR[o.frame.browser] ?? 0, P = o.frame.padding
 const alpha = isAlphaBg(o.frame.background)
+if (o.frame.device === 'iphone' && P < phoneEdge(W) + 8) console.warn(`note: frame.padding ${P} is tight for the iPhone body (${phoneEdge(W)}px edge); raise it`)
 
 // the deepest zoom anywhere in the shot list sets how densely the page is rendered
 const zooms = [...o.setup, ...o.sequence].filter((s) => s.camera).map((s) => s.scale || (s.camera === 'follow' ? 1.6 : 1))

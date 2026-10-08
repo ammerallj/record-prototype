@@ -192,5 +192,6 @@ Targets are re-aimed every frame, so the cursor lands on things that drift.
 - Mobile: add `"device": "mobile"` (or `"touch": true` with a `viewport`) for a finger dot and real
   touch input; `tap`, `swipe` and `longPress` steps are in `references/options.md`. A desktop shot
   list re-renders as mobile with that one line, then fix any targets the narrow layout moves.
+  For a phone body around the screen use `"device": "iphone"` and `"frame": { "color": "black" | "gray" | "white" }`.
 - Requires Google Chrome at the default macOS path (override with `"chrome"`) and the network
   for any remote images the page loads.
