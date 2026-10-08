@@ -2,7 +2,7 @@
 
 A Claude skill that records smooth, portfolio-quality demo videos of a running web prototype from a shot list.
 
-![Preview: a 13-second clip recorded from a shot list: pan an image grid, hover an image, type a search](docs/preview.gif)
+![Preview: a 13-second clip recorded from a shot list: pan an image grid, hover an image, type a search](docs/preview.webp)
 
 <sub>Recorded with `record-prototype/examples/public-work-search.json` against [Public Work](https://www.cosmos.so/public-work), a third-party site used purely as a demo target.</sub>
 
