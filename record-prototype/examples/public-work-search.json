@@ -1,0 +1,85 @@
+{
+  "name": "example-public-work",
+  "url": "https://www.cosmos.so/public-work",
+  "settle": 6000,
+  "treatment": "clean",
+  "output": {
+    "formats": [
+      "mp4"
+    ],
+    "poster": true,
+    "fadeOut": 500
+  },
+  "setup": [
+    {
+      "note": "close the intro card, off camera"
+    },
+    {
+      "click": {
+        "x": 302,
+        "y": 455
+      },
+      "ms": 200
+    },
+    {
+      "wait": 1200
+    },
+    {
+      "jump": {
+        "x": 0.72,
+        "y": 0.62
+      }
+    },
+    {
+      "wait": 400
+    }
+  ],
+  "sequence": [
+    {
+      "note": "1. rest on the grid",
+      "wait": 1800
+    },
+    {
+      "note": "2. pan the grid",
+      "drag": {
+        "from": {
+          "x": 0.72,
+          "y": 0.62
+        },
+        "to": {
+          "x": 0.36,
+          "y": 0.34
+        },
+        "ms": 1400
+      },
+      "ms": 900
+    },
+    {
+      "wait": 900
+    },
+    {
+      "note": "3. hover an image",
+      "hover": {
+        "x": 0.56,
+        "y": 0.58
+      },
+      "ms": 1000,
+      "hold": 1600
+    },
+    {
+      "note": "4. into the search box",
+      "click": "input[role=combobox]",
+      "ms": 1100
+    },
+    {
+      "wait": 500
+    },
+    {
+      "type": "astronomy"
+    },
+    {
+      "note": "5. hold on the typed query and suggestions",
+      "wait": 2800
+    }
+  ]
+}
