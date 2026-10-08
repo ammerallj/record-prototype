@@ -215,8 +215,8 @@ Targets are re-aimed every frame, so the cursor lands on things that drift.
   `"nativeCaret": true`). Any other real-time-only effect (native video, CSS driven by wall clock)
   has the same problem: look at it in the contact sheet, then drive it with `css` or `js`.
 - **A step that hangs is reported, not endless.** Each step has a real-time limit (`stepTimeout`, 90000
-  ms); a stuck step prints its number and exits. Known case: pressing `Enter` to send inside an open
-  thread hung the recorder while the app was fine; click the Send button instead
+  ms); a stuck step prints its number and exits. Known case: pressing `Enter` to send a message from a
+  chat input hung the recorder while the app was fine; click the Send button instead
   (`{ "click": "button[aria-label='Send']" }`). Use that workaround whenever Enter stalls.
 - **Recording stays out of the app.** Never add recording switches, query params or demo-only
   code to the prototype. Film-only changes go through `hide`, `css`, `intercept` (rewrite a
