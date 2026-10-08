@@ -2,6 +2,10 @@
 
 A Claude skill that records smooth, portfolio-quality demo videos of a running web prototype from a shot list.
 
+![Preview: a 13-second clip recorded from a shot list: pan an image grid, hover an image, type a search](docs/preview.gif)
+
+<sub>Recorded with `record-prototype/examples/public-work-search.json` against [Public Work](https://www.cosmos.so/public-work), a third-party site used purely as a demo target.</sub>
+
 - **Frame-stepped**: the page runs on the recorder's own clock and every frame is rendered before it is filmed, so the video never stutters, however heavy the page
 - **Shot lists, not screen recordings**: interactions (hover, click, type, scroll, drag, keys) and camera moves (zoom, pan, follow the cursor, slow drift) are scripted, so every take is identical and re-renders against each new version of the prototype
 - **Any stage**: rough experiments can be filmed by getting the app into state off camera and scripting around what isn't built yet
